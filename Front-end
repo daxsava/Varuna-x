@@ -1,0 +1,543 @@
+import React, { useState, useEffect, useRef } from 'react';
+
+// Using inline SVG for icons to avoid external library dependencies
+const StormIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-cloud-lightning">
+    <path d="M6 16.32A7.5 7.5 0 0 1 12 8a8.5 8.5 0 0 1 8 5.17" />
+    <path d="M20 8A4 4 0 0 0 16 4h-2.18a3 3 0 0 0-5.46-1.12A4 4 0 0 0 2 8" />
+    <path d="m11 20-3-5h4l-3-5h4l-3-5" />
+  </svg>
+);
+
+const TideIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucude-waves">
+    <path d="M2 13a4 4 0 0 1 4-4 4 4 0 0 1 4 4a4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 1 4-4" />
+    <path d="M2 20a4 4 0 0 1 4-4 4 4 0 0 1 4 4a4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 1 4-4" />
+  </svg>
+);
+
+const PollutionIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-droplet">
+    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+  </svg>
+);
+
+const SosIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-siren">
+    <path d="M7.74 13.79A2 2 0 1 1 5 12a2 2 0 0 1 2.74 1.79Z" />
+    <path d="M12.26 13.79A2 2 0 1 1 9.5 12a2 2 0 0 1 2.76 1.79Z" />
+    <path d="M16.76 13.79A2 2 0 1 1 14 12a2 2 0 0 1 2.76 1.79Z" />
+    <rect width="10" height="15" x="7" y="5" rx="2" ry="2" />
+    <path d="M16 5V2a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3" />
+    <path d="M12 18v4" />
+  </svg>
+);
+
+const HomeIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-home">
+    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+    <polyline points="9 22 9 12 15 12 15 22" />
+  </svg>
+);
+
+const AlertsIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bell-ring">
+    <path d="M18 8a6 6 0 0 0-6-6v.05A3.48 3.48 0 0 1 15 9a3.48 3.48 0 0 1-3 3.95V14" />
+    <path d="M22 10c0 1.66-3.6 5-10 5s-10-3.34-10-5" />
+    <path d="M12 14v4a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-4" />
+    <path d="M12 14v4a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-4" />
+  </svg>
+);
+
+const MapIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-map-pin">
+    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+    <circle cx="12" cy="9" r="3" />
+  </svg>
+);
+
+const ReportIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-file-plus-2">
+    <path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v10" />
+    <path d="M14 2v6h6" />
+    <path d="M4 16h6" />
+    <path d="M7 13v6" />
+  </svg>
+);
+
+const SettingsIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-settings">
+    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v2a2 2 0 0 1-2 2H4a2 2 0 0 0-2 2v.44a2 2 0 0 0 2 2h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-2a2 2 0 0 1 2-2h2a2 2 0 0 0 2-2v-.44a2 2 0 0 0-2-2h-2a2 2 0 0 1-2-2V4a2 2 0 0 0-2-2z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+// Mock data for the dashboard
+const mockMetrics = [
+  { title: 'Tide Levels', value: '1.2m', trend: '+0.1m in 24h', icon: <TideIcon />, color: '#0077B6' },
+  { title: 'Algal Blooms', value: 'Low', trend: 'No change', icon: <PollutionIcon />, color: '#00B894' },
+  { title: 'Water Quality', value: '8/10', trend: 'Improving', icon: <PollutionIcon />, color: '#00B894' },
+  { title: 'Cyclonic Activity', value: 'Alert', trend: 'Category 1', icon: <StormIcon />, color: '#FF4B4B' },
+];
+
+const mockAlerts = [
+  { id: 1, title: 'High Tide Alert', time: '5 mins ago', level: 'Severe', description: 'Tide levels are projected to exceed normal range, affecting low-lying coastal areas.', whatToDo: 'Evacuate low-lying areas, secure boats, and monitor official channels for updates.', location: 'Coastal Area A' },
+  { id: 2, title: 'Illegal Dumping Detected', time: '23 mins ago', level: 'Moderate', description: 'Satellite imagery analysis indicates potential illegal dumping activity near a local estuary.', whatToDo: 'Dispatch a patrol team to the coordinates (12.345, -67.890) for verification.', location: 'Estuary B' },
+  { id: 3, title: 'Water Pollution Anomaly', time: '1 hr ago', level: 'Low', description: 'Sensor data shows a minor spike in chemical pollutants near the coast.', whatToDo: 'Deploy water sampling drones and test for abnormal contaminant levels.', location: 'Beach C' },
+  { id: 4, title: 'Storm Surge Warning', time: '2 hrs ago', level: 'Severe', description: 'A storm surge is expected to hit the coast in the next 12 hours.', whatToDo: 'Secure property, and move to higher ground immediately.', location: 'Coastal Area D' },
+  { id: 5, title: 'Cyanobacteria Bloom', time: '4 hrs ago', level: 'Moderate', description: 'A large cyanobacteria bloom has been detected in the bay area.', whatToDo: 'Avoid contact with water and do not consume shellfish from the affected area.', location: 'Bay E' },
+];
+
+// Reusable components
+const Button = ({ children, onClick, variant = 'primary', className = '' }) => {
+  let styles = 'bg-[#0077B6] text-white'; // Primary button
+  if (variant === 'secondary') {
+    styles = 'bg-gray-200 text-gray-800';
+  } else if (variant === 'alert') {
+    styles = 'bg-[#FF4B4B] text-white';
+  }
+  return (
+    <button onClick={onClick} className={`px-4 py-2 rounded-full font-semibold transition-colors ${styles} ${className}`}>
+      {children}
+    </button>
+  );
+};
+
+const Card = ({ children, className = '' }) => (
+  <div className={`bg-white p-6 rounded-2xl shadow-sm ${className}`}>
+    {children}
+  </div>
+);
+
+const PageContainer = ({ children }) => (
+  <main className="p-4 pt-8 pb-20 overflow-y-auto w-full h-full flex flex-col">
+    {children}
+  </main>
+);
+
+// Screens
+const LoginScreen = ({ onLogin }) => {
+  const [isLogin, setIsLogin] = useState(true);
+
+  const handleToggle = () => {
+    setIsLogin(!isLogin);
+  };
+
+  const handleFormSubmit = () => {
+    // In a real app, this is where you'd handle authentication logic
+    onLogin();
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#E5E5E5] text-gray-900 font-sans p-6">
+      <div className="text-center mb-10">
+        <h1 className="text-3xl font-bold mb-2">Varuna X</h1>
+        <p className="text-sm text-gray-600">Coastal Threat Alert System</p>
+      </div>
+      <Card className="w-full max-w-sm p-8 space-y-6">
+        <h2 className="text-xl font-bold text-center">{isLogin ? 'Sign In' : 'Sign Up'}</h2>
+        <input type="email" placeholder="Email" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0077B6]" />
+        <input type="password" placeholder="Password" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0077B6]" />
+        {!isLogin && (
+          <input type="password" placeholder="Confirm Password" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0077B6]" />
+        )}
+        <Button onClick={handleFormSubmit} className="w-full">
+          {isLogin ? 'Sign In' : 'Sign Up'}
+        </Button>
+        <p className="text-center text-sm text-gray-600">
+          {isLogin ? "Don't have an account?" : "Already have an account?"}
+          <span onClick={handleToggle} className="text-[#0077B6] font-semibold ml-1 cursor-pointer">
+            {isLogin ? 'Sign Up' : 'Sign In'}
+          </span>
+        </p>
+      </Card>
+    </div>
+  );
+};
+
+const HomeScreen = ({ onAlertClick }) => (
+  <PageContainer>
+    <div className="flex items-center justify-between mb-6">
+      <h1 className="text-2xl font-bold">Dashboard</h1>
+      <p className="text-sm text-[#00B894] font-semibold flex items-center">
+        <span className="relative flex h-2 w-2 mr-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00B894] opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00B894]"></span>
+        </span>
+        Operational
+      </p>
+    </div>
+    <div className="mb-8">
+      <h2 className="text-lg font-bold mb-4">Current Status</h2>
+      <div className="grid grid-cols-2 gap-4">
+        {mockMetrics.map((metric, index) => (
+          <Card key={index} className="flex flex-col items-start gap-2">
+            <span style={{ color: metric.color }}>{metric.icon}</span>
+            <p className="text-sm text-gray-600">{metric.title}</p>
+            <p className="text-xl font-bold text-gray-900">{metric.value}</p>
+            <p className="text-xs text-gray-500">{metric.trend}</p>
+          </Card>
+        ))}
+      </div>
+    </div>
+    <div className="mb-8">
+      <h2 className="text-lg font-bold mb-4">Active Alerts</h2>
+      <div className="space-y-3">
+        {mockAlerts.slice(0, 3).map((alert, index) => (
+          <Card key={index} className="cursor-pointer border-l-4" style={{ borderColor: alert.level === 'Severe' ? '#FF4B4B' : alert.level === 'Moderate' ? '#F6AD55' : '#4299E1' }} onClick={() => onAlertClick(alert)}>
+            <div className="flex justify-between items-center mb-1">
+              <p className="font-semibold text-gray-900">{alert.title}</p>
+              <span className={`text-xs font-medium px-2 py-1 rounded-full ${alert.level === 'Severe' ? 'bg-[#FF4B4B] text-white' : alert.level === 'Moderate' ? 'bg-[#F6AD55] text-white' : 'bg-[#4299E1] text-white'}`}>
+                {alert.level}
+              </span>
+            </div>
+            <p className="text-xs text-gray-500">{alert.description}</p>
+          </Card>
+        ))}
+      </div>
+    </div>
+  </PageContainer>
+);
+
+const AlertsScreen = ({ onAlertClick }) => (
+  <PageContainer>
+    <div className="flex items-center mb-6">
+      <h1 className="text-2xl font-bold">All Alerts</h1>
+    </div>
+    <div className="space-y-3">
+      {mockAlerts.map((alert, index) => (
+        <Card key={index} className="cursor-pointer border-l-4" style={{ borderColor: alert.level === 'Severe' ? '#FF4B4B' : alert.level === 'Moderate' ? '#F6AD55' : '#4299E1' }} onClick={() => onAlertClick(alert)}>
+          <div className="flex justify-between items-center mb-1">
+            <p className="font-semibold text-gray-900">{alert.title}</p>
+            <span className={`text-xs font-medium px-2 py-1 rounded-full ${alert.level === 'Severe' ? 'bg-[#FF4B4B] text-white' : alert.level === 'Moderate' ? 'bg-[#F6AD55] text-white' : 'bg-[#4299E1] text-white'}`}>
+              {alert.level}
+            </span>
+          </div>
+          <p className="text-xs text-gray-500">{alert.description}</p>
+          <span className="text-xs text-gray-400 mt-2 block">Location: {alert.location}</span>
+        </Card>
+      ))}
+    </div>
+  </PageContainer>
+);
+
+const AlertDetailsScreen = ({ alert, onBack }) => (
+  <PageContainer>
+    <div className="flex items-center mb-6">
+      <button onClick={onBack} className="text-gray-600 mr-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+      </button>
+      <h1 className="text-2xl font-bold">Alert Details</h1>
+    </div>
+    <Card className="mb-4">
+      <h2 className="text-xl font-bold mb-2" style={{ color: alert.level === 'Severe' ? '#FF4B4B' : alert.level === 'Moderate' ? '#F6AD55' : '#4299E1' }}>{alert.title}</h2>
+      <p className="text-sm text-gray-600 mb-2">{alert.time}</p>
+      <p className="text-sm text-gray-800 font-semibold mb-1">Location:</p>
+      <p className="text-sm text-gray-600 mb-4">{alert.location}</p>
+      <p className="text-sm text-gray-800 font-semibold mb-1">Description:</p>
+      <p className="text-sm text-gray-600 mb-4">{alert.description}</p>
+      <p className="text-sm text-gray-800 font-semibold mb-1">What to do:</p>
+      <p className="text-sm text-gray-600">{alert.whatToDo}</p>
+      <Button variant="alert" className="w-full mt-6">Acknowledge</Button>
+    </Card>
+  </PageContainer>
+);
+
+const MapScreen = ({ onBack }) => {
+  const [loading, setLoading] = useState(true);
+  const mapRef = useRef(null);
+
+  useEffect(() => {
+    // Function to initialize the map
+    const initMap = () => {
+      // Ensure both the google object and the map container are available
+      if (window.google && mapRef.current) {
+        new window.google.maps.Map(mapRef.current, {
+          center: { lat: 34.0522, lng: -118.2437 },
+          zoom: 10,
+        });
+        setLoading(false);
+      }
+    };
+
+    // Load the script only if it's not already on the window object
+    if (!window.google) {
+      const script = document.createElement('script');
+      script.src = "https://maps.googleapis.com/maps/api/js?libraries=places";
+      script.async = true;
+      script.defer = true;
+      script.onload = initMap;
+      document.head.appendChild(script);
+
+      // Clean up function to remove the script
+      return () => {
+        document.head.removeChild(script);
+      };
+    } else {
+      // If the script is already loaded, just initialize the map
+      initMap();
+    }
+  }, []); // Empty dependency array ensures this effect runs only once on mount
+
+  return (
+    <PageContainer>
+      <div className="flex items-center mb-6">
+        <button onClick={onBack} className="text-gray-600 mr-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+        </button>
+        <h1 className="text-2xl font-bold">Threat Map</h1>
+      </div>
+      <Card className="flex items-center justify-center h-full">
+        {loading ? (
+          <p className="text-gray-500 text-center animate-pulse">Loading map...</p>
+        ) : null}
+        <div ref={mapRef} className="w-full h-full rounded-xl" style={{ visibility: loading ? 'hidden' : 'visible' }}></div>
+      </Card>
+    </PageContainer>
+  );
+};
+
+const ReportScreen = ({ onBack }) => {
+  const [location, setLocation] = useState({
+    latitude: null,
+    longitude: null,
+    error: null,
+    address: null,
+  });
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Function to get the current location and send it to the backend for processing
+  const getLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setLocation({ latitude, longitude, error: null, address: null });
+          fetchLocationAddress(latitude, longitude); // Send the location to the backend
+        },
+        (error) => {
+          setLocation({ ...location, error: error.message });
+        }
+      );
+    } else {
+      setLocation({ ...location, error: 'Geolocation is not supported by this browser.' });
+    }
+  };
+
+  const fetchLocationAddress = async (latitude, longitude) => {
+    setIsLoading(true);
+    try {
+      // NOTE: This fetch call is commented out because a live backend is not available.
+      // In a real application, you would uncomment the code below and ensure
+      // your backend is running and accessible at the specified URL.
+
+      // const response = await fetch(`/api/getAddress?lat=${latitude}&lng=${longitude}`);
+      // if (!response.ok) {
+      //   throw new Error(`HTTP error! status: ${response.status}`);
+      // }
+      // const data = await response.json();
+      // setLocation((prev) => ({ ...prev, address: data.address }));
+
+      // --- Simulation for demo purposes ---
+      console.log(`Simulating backend call for Lat ${latitude}, Lng ${longitude}`);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setLocation((prev) => ({ ...prev, address: 'Simulated Address: 1234 Coastal Way, Ocean City' }));
+      // ------------------------------------
+
+    } catch (error) {
+      console.error('Error fetching address:', error);
+      // Fallback for the demo since the API won't work
+      setLocation((prev) => ({ ...prev, address: 'Address not available (backend not implemented).' }));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getLocation(); // Get the location when the component mounts
+  }, []);
+
+  return (
+    <PageContainer>
+      <div className="flex items-center mb-6">
+        <button onClick={onBack} className="text-gray-600 mr-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+        </button>
+        <h1 className="text-2xl font-bold">Report a Threat</h1>
+      </div>
+      <Card className="w-full space-y-4">
+        <h2 className="text-xl font-bold">Report Oil Spill / Illegal Dumping</h2>
+        <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0077B6]">
+          <option>Oil Spill</option>
+          <option>Illegal Dumping</option>
+          <option>Other</option>
+        </select>
+        <textarea placeholder="Describe the threat..." rows="4" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0077B6]"></textarea>
+        
+        {/* New UI for location */}
+        <h3 className="text-md font-semibold text-gray-800">Current Location</h3>
+        {location.error && <p className="text-sm text-[#FF4B4B]">{location.error}</p>}
+        {isLoading ? (
+          <p className="text-center text-sm text-gray-500 animate-pulse">Loading address...</p>
+        ) : location.address ? (
+          <p className="text-sm text-gray-800">{location.address}</p>
+        ) : (
+          <p className="text-sm text-gray-600">
+            Latitude: {location.latitude} <br />
+            Longitude: {location.longitude}
+          </p>
+        )}
+        
+        <Button variant="primary" className="w-full">Submit Report</Button>
+      </Card>
+    </PageContainer>
+  );
+};
+
+const SettingsScreen = ({ onBack }) => {
+  const [smsEnabled, setSmsEnabled] = useState(true);
+  const [pushEnabled, setPushEnabled] = useState(true);
+  return (
+    <PageContainer>
+      <div className="flex items-center mb-6">
+        <button onClick={onBack} className="text-gray-600 mr-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+        </button>
+        <h1 className="text-2xl font-bold">Settings</h1>
+      </div>
+      <Card className="space-y-4">
+        <h2 className="text-lg font-bold">Alert Preferences</h2>
+        <div className="flex items-center justify-between">
+          <p className="text-gray-800">SMS Alerts</p>
+          <div onClick={() => setSmsEnabled(!smsEnabled)} className={`relative inline-flex items-center h-6 w-11 rounded-full cursor-pointer transition-colors ${smsEnabled ? 'bg-[#0077B6]' : 'bg-gray-200'}`}>
+            <span className={`inline-block w-4 h-4 transform transition-transform rounded-full bg-white ${smsEnabled ? 'translate-x-6' : 'translate-x-1'}`}></span>
+          </div>
+        </div>
+        <div className="flex items-center justify-between">
+          <p className="text-gray-800">Push Notifications</p>
+          <div onClick={() => setPushEnabled(!pushEnabled)} className={`relative inline-flex items-center h-6 w-11 rounded-full cursor-pointer transition-colors ${pushEnabled ? 'bg-[#0077B6]' : 'bg-gray-200'}`}>
+            <span className={`inline-block w-4 h-4 transform transition-transform rounded-full bg-white ${pushEnabled ? 'translate-x-6' : 'translate-x-1'}`}></span>
+          </div>
+        </div>
+      </Card>
+    </PageContainer>
+  );
+};
+
+const App = () => {
+  const [currentPage, setCurrentPage] = useState('home');
+  const [selectedAlert, setSelectedAlert] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Function to handle login (simulated)
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+    setCurrentPage('home');
+  };
+
+  // Function to handle alert click
+  const handleAlertClick = (alert) => {
+    setSelectedAlert(alert);
+    setCurrentPage('alertDetails');
+  };
+
+  const renderContent = () => {
+    if (!isLoggedIn) {
+      return <LoginScreen onLogin={handleLogin} />;
+    }
+
+    switch (currentPage) {
+      case 'home':
+        return <HomeScreen onAlertClick={handleAlertClick} />;
+      case 'alerts':
+        return <AlertsScreen onAlertClick={handleAlertClick} />;
+      case 'alertDetails':
+        return <AlertDetailsScreen alert={selectedAlert} onBack={() => setCurrentPage('alerts')} />;
+      case 'map':
+        return <MapScreen onBack={() => setCurrentPage('home')} />;
+      case 'report':
+        return <ReportScreen onBack={() => setCurrentPage('home')} />;
+      case 'settings':
+        return <SettingsScreen onBack={() => setCurrentPage('home')} />;
+      default:
+        return <HomeScreen onAlertClick={handleAlertClick} />;
+    }
+  };
+
+  return (
+    <div className="bg-[#E5E5E5] text-gray-900 min-h-screen font-sans antialiased flex flex-col items-center">
+      <style>
+        {`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+          font-family: 'Inter', sans-serif;
+          margin: 0;
+          padding: 0;
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .active-nav-item {
+          color: #0077B6;
+        }
+        `}
+      </style>
+      <script src="https://cdn.tailwindcss.com"></script>
+
+      <div className="w-full max-w-md h-screen flex flex-col shadow-xl rounded-xl overflow-hidden bg-gray-100">
+        <div className="flex-1 overflow-y-auto">
+          {renderContent()}
+        </div>
+
+        {/* Bottom Navigation Bar */}
+        {isLoggedIn && (
+          <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-gray-200 shadow-md z-50 rounded-t-2xl">
+            <ul className="flex justify-around py-3 px-2">
+              <li className="flex-1">
+                <button onClick={() => setCurrentPage('home')} className={`flex flex-col items-center w-full text-xs font-medium ${currentPage === 'home' ? 'text-[#0077B6]' : 'text-gray-500'}`}>
+                  <HomeIcon className="mb-1" />
+                  <span>Home</span>
+                </button>
+              </li>
+              <li className="flex-1">
+                <button onClick={() => setCurrentPage('map')} className={`flex flex-col items-center w-full text-xs font-medium ${currentPage === 'map' ? 'text-[#0077B6]' : 'text-gray-500'}`}>
+                  <MapIcon className="mb-1" />
+                  <span>Map</span>
+                </button>
+              </li>
+              <li className="flex-1">
+                <button onClick={() => setCurrentPage('report')} className={`flex flex-col items-center w-full text-xs font-medium ${currentPage === 'report' ? 'text-[#0077B6]' : 'text-gray-500'}`}>
+                  <div className="bg-[#0077B6] p-3 rounded-full text-white -mt-8 shadow-lg">
+                    <ReportIcon />
+                  </div>
+                  <span>Report</span>
+                </button>
+              </li>
+              <li className="flex-1">
+                <button onClick={() => setCurrentPage('alerts')} className={`flex flex-col items-center w-full text-xs font-medium ${currentPage === 'alerts' || currentPage === 'alertDetails' ? 'text-[#0077B6]' : 'text-gray-500'}`}>
+                  <AlertsIcon className="mb-1" />
+                  <span>Alerts</span>
+                </button>
+              </li>
+              <li className="flex-1">
+                <button onClick={() => setCurrentPage('settings')} className={`flex flex-col items-center w-full text-xs font-medium ${currentPage === 'settings' ? 'text-[#0077B6]' : 'text-gray-500'}`}>
+                  <SettingsIcon className="mb-1" />
+                  <span>Settings</span>
+                </button>
+              </li>
+            </ul>
+          </nav>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default App;
+
++
